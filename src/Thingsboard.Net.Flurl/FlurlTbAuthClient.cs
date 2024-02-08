@@ -18,7 +18,7 @@ public class FlurlTbAuthClient : FlurlTbClient<ITbAuthClient>, ITbAuthClient
     /// </summary>
     /// <param name="cancel"></param>
     /// <returns></returns>
-    public Task<TbUserInfo> GetCurrentUserAsync(CancellationToken cancel = default)
+    public Task<TbUserInfo?> GetCurrentUserAsync(CancellationToken cancel = default)
     {
         var policy = RequestBuilder.GetPolicyBuilder<TbUserInfo>()
             .RetryOnHttpTimeout()

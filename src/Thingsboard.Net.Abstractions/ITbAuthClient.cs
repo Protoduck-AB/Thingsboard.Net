@@ -11,7 +11,7 @@ public interface ITbAuthClient : ITbClient<ITbAuthClient>
     /// </summary>
     /// <param name="cancel"></param>
     /// <returns></returns>
-    Task<TbUserInfo> GetCurrentUserAsync(CancellationToken cancel = default);
+    Task<TbUserInfo?> GetCurrentUserAsync(CancellationToken cancel = default);
 
     /// <summary>
     /// Change the password for the User which credentials are used to perform this REST API call. Be aware that previously generated JWT tokens will be still valid until they expire.

@@ -38,6 +38,8 @@ public class TbDeviceInfo
     public bool? CustomerIsPublic { get; }
 
     public string? DeviceProfileName { get; }
+    
+    public bool? Active { get; }
 
     /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
     public TbDeviceInfo(TbEntityId id,
@@ -52,7 +54,8 @@ public class TbDeviceInfo
         TbEntityId?                softwareId,
         string?                    customerTitle,
         bool?                      customerIsPublic,
-        string?                    deviceProfileName)
+        string?                    deviceProfileName,
+        bool?                      active)
     {
         Id                = id;
         CreatedTime       = createdTime;
@@ -67,5 +70,6 @@ public class TbDeviceInfo
         CustomerTitle     = customerTitle;
         CustomerIsPublic  = customerIsPublic;
         DeviceProfileName = deviceProfileName;
+        Active            = active;
     }
 }

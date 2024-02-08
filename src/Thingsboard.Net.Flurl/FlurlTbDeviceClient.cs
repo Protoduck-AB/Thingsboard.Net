@@ -257,7 +257,7 @@ public class FlurlTbDeviceClient : FlurlTbClient<ITbDeviceClient>, ITbDeviceClie
         return policy.ExecuteAsync(async builder =>
         {
             var response = await builder.CreateRequest()
-                .AppendPathSegment($"/api/device/{deviceId}")
+                .AppendPathSegment($"/api/device/info/{deviceId}")  // Added /info to get active status, customerTitle, and deviceProfileName
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
                 .GetJsonAsync<TbDevice>(cancel);
 
