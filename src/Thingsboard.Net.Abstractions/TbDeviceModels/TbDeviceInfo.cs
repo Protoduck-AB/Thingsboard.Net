@@ -40,6 +40,7 @@ public class TbDeviceInfo
     public string? DeviceProfileName { get; }
     
     public bool? Active { get; }
+    
 
     /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
     public TbDeviceInfo(TbEntityId id,

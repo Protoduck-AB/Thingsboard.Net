@@ -39,10 +39,7 @@ public class TbDevice
 
     public TbEntityId? SoftwareId { get; set; }
     
-    public bool? Active { get; set; }
-    
-    public string? CustomerTitle { get; set; }
-    public string? DeviceProfileName { get; set; }
+
 
     /// <summary>
     /// optional, defines additional infos for the device
