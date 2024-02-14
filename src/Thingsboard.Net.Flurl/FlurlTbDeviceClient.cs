@@ -60,7 +60,7 @@ public class FlurlTbDeviceClient : FlurlTbClient<ITbDeviceClient>, ITbDeviceClie
     /// <param name="sortOrder">Sort order. ASC (ASCENDING) or DESC (DESCENDING)</param>
     /// <param name="cancel"></param>
     /// <returns></returns>
-    public Task<TbPage<TbDevice>> GetCustomerDeviceInfosAsync(
+    public Task<TbPage<TbDeviceInfo>> GetCustomerDeviceInfosAsync(
         Guid                        customerId,
         int                         pageSize,
         int                         page,
@@ -71,10 +71,10 @@ public class FlurlTbDeviceClient : FlurlTbClient<ITbDeviceClient>, ITbDeviceClie
         TbSortOrder?                sortOrder       = null,
         CancellationToken           cancel          = default)
     {
-        var policy = RequestBuilder.GetPolicyBuilder<TbPage<TbDevice>>()
+        var policy = RequestBuilder.GetPolicyBuilder<TbPage<TbDeviceInfo>>()
             .RetryOnHttpTimeout()
             .RetryOnUnauthorized()
-            .FallbackValueOn(HttpStatusCode.NotFound, TbPage<TbDevice>.Empty)
+            .FallbackValueOn(HttpStatusCode.NotFound, TbPage<TbDeviceInfo>.Empty)
             .Build();
 
         return policy.ExecuteAsync(async builder =>
@@ -89,7 +89,7 @@ public class FlurlTbDeviceClient : FlurlTbClient<ITbDeviceClient>, ITbDeviceClie
                 .SetQueryParam("textSearch",      textSearch)
                 .SetQueryParam("sortProperty",    sortProperty)
                 .SetQueryParam("sortOrder",       sortOrder)
-                .GetJsonAsync<TbPage<TbDevice>>(cancel);
+                .GetJsonAsync<TbPage<TbDeviceInfo>>(cancel);
 
             return response;
         });

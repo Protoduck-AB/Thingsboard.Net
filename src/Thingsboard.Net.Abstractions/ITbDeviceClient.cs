@@ -33,7 +33,7 @@ public interface ITbDeviceClient : ITbClient<ITbDeviceClient>
     /// <param name="sortOrder">Sort order. ASC (ASCENDING) or DESC (DESCENDING)</param>
     /// <param name="cancel"></param>
     /// <returns></returns>
-    Task<TbPage<TbDevice>> GetCustomerDeviceInfosAsync(
+    Task<TbPage<TbDeviceInfo>> GetCustomerDeviceInfosAsync(
         Guid                        customerId,
         int                         pageSize,
         int                         page,
