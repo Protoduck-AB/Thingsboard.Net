@@ -75,4 +75,6 @@ public class FlurlTbClientFactory
     public ITbDeviceProfileClient CreateDeviceProfileClient() => new FlurlTbDeviceProfileClient(CreateRequestBuilder());
 
     public ITbAssetProfileClient CreateAssetProfileClient() => new FlurlTbAssetProfileClient(CreateRequestBuilder());
+    
+    public ITbEntityRelationClient CreateEntityRelationClient() => new FlurlTbEntityRelationClient(CreateRequestBuilder());
 }
