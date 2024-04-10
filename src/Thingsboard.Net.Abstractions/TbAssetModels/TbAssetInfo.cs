@@ -26,4 +26,6 @@ public class TbAssetInfo
     public TbEntityId? TenantId { get; set; }
 
     public string? Type { get; set; }
+    
+    public TbEntityId? OwnerId { get; set; }
 }

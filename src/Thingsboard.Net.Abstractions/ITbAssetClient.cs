@@ -192,4 +192,12 @@ public interface ITbAssetClient : ITbClient<ITbAssetClient>
         TbAssetSearchSortProperty? sortProperty = null,
         TbSortOrder?               sortOrder    = null,
         CancellationToken          cancel       = default);
+
+    Task<TbPage<TbAssetInfo>> GetAssetsByEntityGroup(Guid entityGroupId, 
+        int                        pageSize,
+        int                        page,
+        string?                    textSearch   = null,
+        TbAssetSearchSortProperty? sortProperty = null,
+        TbSortOrder?               sortOrder    = null,
+        CancellationToken cancel = default);
 }

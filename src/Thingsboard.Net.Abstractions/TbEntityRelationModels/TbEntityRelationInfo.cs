@@ -10,7 +10,7 @@ public class TbEntityRelationInfo
     /// <summary>
     /// The from entity id.
     /// </summary>
-    public TbEntityId From { get; set; } = TbEntityId.Empty;
+    public TbEntityId? From { get; set; } = null; // Had to change from Empty to null since empty messed up deserialization
 
     /// <summary>
     /// The from entity name.
@@ -20,7 +20,7 @@ public class TbEntityRelationInfo
     /// <summary>
     /// The to entity id.
     /// </summary>
-    public TbEntityId To { get; set; } = TbEntityId.Empty;
+    public TbEntityId? To { get; set; } = null; // Had to change from Empty to null since empty messed up deserialization
 
     /// <summary>
     /// The to entity name.

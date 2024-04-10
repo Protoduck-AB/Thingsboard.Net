@@ -498,4 +498,33 @@ public class FlurlTbAssetClient : FlurlTbClient<ITbAssetClient>, ITbAssetClient
             return await request.GetJsonAsync<TbPage<TbAsset>>(cancel);
         });
     }
+
+    public Task<TbPage<TbAssetInfo>> GetAssetsByEntityGroup(Guid entityGroupId, 
+        int                        pageSize,
+        int                        page,
+        string?                    textSearch   = null,
+        TbAssetSearchSortProperty? sortProperty = null,
+        TbSortOrder?               sortOrder    = null,
+        CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder<TbPage<TbAssetInfo>>()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .FallbackValueOn(HttpStatusCode.NotFound, TbPage<TbAssetInfo>.Empty)
+            .Build();
+
+        return policy.ExecuteAsync(async builder =>
+        {
+            var request = builder.CreateRequest()
+                .AppendPathSegment($"/api/entityGroup/{entityGroupId}/assets")
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .SetQueryParam("pageSize",     pageSize)
+                .SetQueryParam("page",         page)
+                .SetQueryParam("textSearch",   textSearch)
+                .SetQueryParam("sortProperty", sortProperty)
+                .SetQueryParam("sortOrder",    sortOrder);
+
+            return await request.GetJsonAsync<TbPage<TbAssetInfo>>(cancel);
+        });
+    }
 }
