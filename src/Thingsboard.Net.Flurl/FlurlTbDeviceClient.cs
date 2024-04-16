@@ -8,6 +8,33 @@ using Thingsboard.Net.Flurl.Utilities;
 
 namespace Thingsboard.Net.Flurl;
 
+
+public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
+{
+    public FlurlTbUserClient(IRequestBuilder builder) : base(builder)
+    {
+    }
+
+    public Task<TbExtendedUserInfo?> GetExtendedUserInfo(Guid userId, CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder<TbExtendedUserInfo?>()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .FallbackValueOn(HttpStatusCode.NotFound, null)
+            .Build();
+
+        return policy.ExecuteAsync(async builder =>
+        {
+            var response = await builder.CreateRequest()
+                .AppendPathSegment($"api/user/info/{userId}")
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .GetJsonAsync<TbExtendedUserInfo>(cancel);
+            
+            return response;
+        });
+    }
+}
+
 /// <summary>
 /// Thingsboard device controller implements by flurl
 /// </summary>

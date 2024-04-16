@@ -58,6 +58,8 @@ public class FlurlTbClientFactory
 
     public ITbDashboardClient CreateDashboardClient() => new FlurlTbDashboardClient(CreateRequestBuilder());
 
+    public ITbUserClient CreateUserClient() => new FlurlTbUserClient(CreateRequestBuilder());
+    
     public ITbDeviceClient CreateDeviceClient() => new FlurlTbDeviceClient(CreateRequestBuilder());
 
     public ITbEntityQueryClient CreateEntityQueryClient() => new FlurlTbEntityQueryClient(CreateRequestBuilder());

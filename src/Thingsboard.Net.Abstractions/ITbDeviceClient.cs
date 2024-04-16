@@ -4,6 +4,11 @@ using System.Threading.Tasks;
 
 namespace Thingsboard.Net;
 
+public interface ITbUserClient : ITbClient<ITbUserClient>
+{
+    Task<TbExtendedUserInfo?> GetExtendedUserInfo(Guid userId, CancellationToken cancel = default);
+}
+
 /// <summary>
 /// The interface that the device queries from Thingsboard
 /// </summary>

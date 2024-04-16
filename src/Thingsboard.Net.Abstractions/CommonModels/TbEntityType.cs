@@ -25,4 +25,5 @@ public enum TbEntityType
     USER,
     WIDGET_TYPE,
     WIDGETS_BUNDLE,
+    ENTITY_GROUP
 }
