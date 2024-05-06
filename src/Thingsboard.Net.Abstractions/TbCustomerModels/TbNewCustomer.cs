@@ -7,6 +7,7 @@ public class TbNewCustomer
     public string?                      Title          { get; set; }
     public string?                      Name           { get; set; }
     public TbEntityId?                  TenantId       { get; set; }
+    public TbEntityId?                  ParentCustomerId { get; set;  }
     public string?                      Country        { get; set; }
     public string?                      State          { get; set; }
     public string?                      City           { get; set; }
