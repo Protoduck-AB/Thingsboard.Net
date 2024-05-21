@@ -20,6 +20,8 @@ public interface ITbUserClient : ITbClient<ITbUserClient>
         CancellationToken cancel = default);
     
     Task ActivateUser(string activateToken, string password, CancellationToken cancel = default);
+    
+    Task DeleteUser(Guid userId, CancellationToken cancel = default);
 }
 
 /// <summary>

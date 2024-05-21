@@ -78,6 +78,22 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
         });
     }
 
+    public Task DeleteUser(Guid userId, CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .Build();
+
+        return policy.ExecuteAsync(async builder =>
+        {
+            await builder.CreateRequest()
+                .AppendPathSegment($"api/user/{userId}")
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .DeleteAsync(cancel);
+        });
+    }
+    
     public Task<TbPage<TbExtendedUserInfo>> GetCustomerUserInfos(Guid customerId,
         int pageSize,
         int page,
