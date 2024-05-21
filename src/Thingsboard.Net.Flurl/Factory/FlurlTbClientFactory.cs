@@ -79,4 +79,6 @@ public class FlurlTbClientFactory
     public ITbAssetProfileClient CreateAssetProfileClient() => new FlurlTbAssetProfileClient(CreateRequestBuilder());
     
     public ITbEntityRelationClient CreateEntityRelationClient() => new FlurlTbEntityRelationClient(CreateRequestBuilder());
+    
+    public ITbEntityGroupClient CreateEntityGroupClient() => new FlurlTbEntityGroupClient(CreateRequestBuilder());
 }
