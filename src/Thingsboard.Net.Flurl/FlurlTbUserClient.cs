@@ -126,7 +126,7 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
         });
     }
 
-    public Task ActivateUser(string activateToken, string password, CancellationToken cancel = default)
+    public Task ActivateUser(string activateToken, string password, bool sendActivationMail = false, CancellationToken cancel = default)
     {
         if (string.IsNullOrWhiteSpace(activateToken)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(activateToken));
         if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(password));
@@ -140,6 +140,7 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
         {
             await builder.CreateRequest()
                 .AppendPathSegment("api/noauth/activate")
+                .SetQueryParam("sendActivationMail", sendActivationMail)
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
                 .PostJsonAsync(new { activateToken, password }, cancel);
         });
