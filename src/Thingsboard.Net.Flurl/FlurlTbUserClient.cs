@@ -126,6 +126,35 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
         });
     }
 
+    public Task<TbPage<TbExtendedUserInfo>> GetUsersByEntityGroupId(Guid entityGroupId, int pageSize, int page,
+        bool? includeCustomers = null,
+        string? textSearch = null, TbUserSearchSortProperty? sortProperty = null, TbSortOrder? sortOrder = null,
+        CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder<TbPage<TbExtendedUserInfo>>()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .FallbackValueOn(HttpStatusCode.NotFound,
+                new TbPage<TbExtendedUserInfo>(0, 0, false, Array.Empty<TbExtendedUserInfo>()))
+            .Build();
+
+        return policy.ExecuteAsync(async builder =>
+        {
+            var response = await builder.CreateRequest()
+                .AppendPathSegment($"api/entityGroup/{entityGroupId}/users")
+                .SetQueryParam("pageSize", pageSize)
+                .SetQueryParam("page", page)
+                .SetQueryParam("includeCustomers", includeCustomers)
+                .SetQueryParam("textSearch", textSearch)
+                .SetQueryParam("sortProperty", sortProperty)
+                .SetQueryParam("sortOrder", sortOrder)
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .GetJsonAsync<TbPage<TbExtendedUserInfo>>(cancel);
+
+            return response;
+        });
+    }
+
     public Task ActivateUser(string activateToken, string password, bool sendActivationMail = false, CancellationToken cancel = default)
     {
         if (string.IsNullOrWhiteSpace(activateToken)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(activateToken));

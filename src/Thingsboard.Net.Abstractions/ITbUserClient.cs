@@ -19,6 +19,15 @@ public interface ITbUserClient : ITbClient<ITbUserClient>
         TbSortOrder? sortOrder = null,
         CancellationToken cancel = default);
     
+    Task<TbPage<TbExtendedUserInfo>> GetUsersByEntityGroupId(Guid entityGroupId,
+        int pageSize,
+        int page,
+        bool? includeCustomers = null,
+        string? textSearch = null,
+        TbUserSearchSortProperty? sortProperty = null,
+        TbSortOrder? sortOrder = null,
+        CancellationToken cancel = default);
+    
     Task ActivateUser(string activateToken, string password, bool sendActivationMail = false, CancellationToken cancel = default);
     
     Task DeleteUser(Guid userId, CancellationToken cancel = default);
