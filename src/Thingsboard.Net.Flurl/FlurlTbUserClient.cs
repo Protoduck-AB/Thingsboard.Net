@@ -155,6 +155,33 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
         });
     }
 
+    public Task<TbPage<TbUserInfo>> GetUsers(int pageSize, int page, string? textSearch = null,
+        TbUserSearchSortProperty? sortProperty = null,
+        TbSortOrder? sortOrder = null, CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder<TbPage<TbUserInfo>>()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .FallbackValueOn(HttpStatusCode.NotFound,
+                new TbPage<TbUserInfo>(0, 0, false, Array.Empty<TbUserInfo>()))
+            .Build();
+
+        return policy.ExecuteAsync(async builder =>
+        {
+            var response = await builder.CreateRequest()
+                .AppendPathSegment("api/user/users")
+                .SetQueryParam("page", page)
+                .SetQueryParam("pageSize", pageSize)
+                .SetQueryParam("textSearch", textSearch)
+                .SetQueryParam("sortProperty", sortProperty)
+                .SetQueryParam("sortOrder", sortOrder)
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .GetJsonAsync<TbPage<TbUserInfo>>(cancel);
+
+            return response;
+        });
+    }
+
     public Task ActivateUser(string activateToken, string password, bool sendActivationMail = false, CancellationToken cancel = default)
     {
         if (string.IsNullOrWhiteSpace(activateToken)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(activateToken));

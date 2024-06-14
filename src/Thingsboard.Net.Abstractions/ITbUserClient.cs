@@ -28,6 +28,14 @@ public interface ITbUserClient : ITbClient<ITbUserClient>
         TbSortOrder? sortOrder = null,
         CancellationToken cancel = default);
     
+    Task<TbPage<TbUserInfo>> GetUsers(
+        int pageSize, 
+        int page, 
+        string? textSearch = null, 
+        TbUserSearchSortProperty? sortProperty = null,
+        TbSortOrder? sortOrder = null,
+        CancellationToken cancel = default);
+    
     Task ActivateUser(string activateToken, string password, bool sendActivationMail = false, CancellationToken cancel = default);
     
     Task DeleteUser(Guid userId, CancellationToken cancel = default);
