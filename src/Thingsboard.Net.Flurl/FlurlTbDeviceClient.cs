@@ -37,7 +37,7 @@ public class FlurlTbDeviceClient : FlurlTbClient<ITbDeviceClient>, ITbDeviceClie
         return policy.ExecuteAsync(async builder =>
         {
             var response = await builder.CreateRequest()
-                .AppendPathSegment($"api/customer/{customerId}/device/{deviceId}")
+                .AppendPathSegment($"api/owner/CUSTOMER/{customerId}/DEVICE/{deviceId}")
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
                 .PostJsonAsync(null, cancel)
                 .ReceiveJson<TbDevice>();
