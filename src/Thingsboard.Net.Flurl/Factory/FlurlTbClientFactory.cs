@@ -81,4 +81,6 @@ public class FlurlTbClientFactory
     public ITbEntityRelationClient CreateEntityRelationClient() => new FlurlTbEntityRelationClient(CreateRequestBuilder());
     
     public ITbEntityGroupClient CreateEntityGroupClient() => new FlurlTbEntityGroupClient(CreateRequestBuilder());
+    
+    public ITbOtaPackageClient CreateOtaPackageClient() => new FlurlTbOtaPackageClient(CreateRequestBuilder());
 }
