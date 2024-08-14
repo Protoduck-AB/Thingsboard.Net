@@ -8,39 +8,6 @@ using Thingsboard.Net.Flurl.Utilities;
 
 namespace Thingsboard.Net.Flurl;
 
-
-public class FlurlTbOtaPackageClient : FlurlTbClient<ITbOtaPackageClient>, ITbOtaPackageClient
-{
-    public FlurlTbOtaPackageClient(IRequestBuilder builder) : base(builder)
-    {
-    }
-
-    public Task<TbPage<TbOtaPackage>> GetOtaPackagesAsync(Guid deviceProfileId,  string type, int pageSize, int page, string? textSearch = null,
-        TbDeviceSearchSortProperty? sortProperty = null, TbSortOrder? sortOrder = null, CancellationToken cancel = default)
-    {
-        var policy = RequestBuilder.GetPolicyBuilder<TbPage<TbOtaPackage>>()
-            .RetryOnHttpTimeout()
-            .RetryOnUnauthorized()
-            .FallbackValueOn(HttpStatusCode.NotFound, TbPage<TbOtaPackage>.Empty)
-            .Build();
-
-        return policy.ExecuteAsync(async builder =>
-        {
-            var response = await builder.CreateRequest()
-                .AppendPathSegment($"api/otaPackages/{deviceProfileId}/{type}")
-                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
-                .SetQueryParam("pageSize",        pageSize)
-                .SetQueryParam("page",            page)
-                .SetQueryParam("textSearch",      textSearch)
-                .SetQueryParam("sortProperty",    sortProperty)
-                .SetQueryParam("sortOrder",       sortOrder)
-                .GetJsonAsync<TbPage<TbOtaPackage>>(cancel);
-
-            return response;
-        });
-    }
-}
-
 /// <summary>
 /// Thingsboard device controller implements by flurl
 /// </summary>
