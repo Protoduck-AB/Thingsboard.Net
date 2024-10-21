@@ -244,4 +244,34 @@ public class FlurlTbCustomerClient : FlurlTbClient<ITbCustomerClient>, ITbCustom
             return response;
         });
     }
+
+    public Task<TbPage<TbCustomer>> GetResellerCustomersAsync(
+        int pageSize,
+        int page,
+        TbCustomerSortProperty? sortProperty = null,
+        TbSortOrder? sortOrder = null,
+        bool? includeCustomers = false,
+        CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder<TbPage<TbCustomer>>()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .FallbackValueOn(HttpStatusCode.NotFound, TbPage<TbCustomer>.Empty)
+            .Build();
+
+        return policy.ExecuteAsync(async builder =>
+        {
+            var request = builder.CreateRequest()
+                .AppendPathSegment($"/api/customerInfos/all")
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .SetQueryParam("pageSize", pageSize)
+                .SetQueryParam("page", page)
+                .SetQueryParam("sortProperty", sortProperty)
+                .SetQueryParam("sortOrder", sortOrder)
+                .SetQueryParam("includeCustomers", includeCustomers);
+
+            return await request.GetJsonAsync<TbPage<TbCustomer>>(cancel);
+        });
+    }
+    
 }

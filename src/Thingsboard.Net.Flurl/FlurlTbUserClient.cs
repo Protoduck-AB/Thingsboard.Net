@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Flurl.Http;
+using Newtonsoft.Json;
 using Thingsboard.Net.Exceptions;
 using Thingsboard.Net.Flurl.Utilities;
 
@@ -10,6 +13,11 @@ namespace Thingsboard.Net.Flurl;
 
 public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
 {
+    private static readonly JsonSerializerSettings JsonSerializerSettingsWithNullableGuidConverter = new()
+    {
+        Converters = new List<JsonConverter> { new GuidNullableConverter() }
+    };
+    
     public FlurlTbUserClient(IRequestBuilder builder) : base(builder)
     {
     }
@@ -24,12 +32,14 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
 
         return policy.ExecuteAsync(async builder =>
         {
-            var response = await builder.CreateRequest()
+            // This is surely not the best way to handle the cases where the HomeDashboardId is null, but it works for now 
+            var rawResponse = await builder.CreateRequest()
                 .AppendPathSegment($"api/user/info/{userId}")
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
-                .GetJsonAsync<TbExtendedUserInfo>(cancel);
-            
-            return response;
+                .SendAsync(HttpMethod.Get, cancellationToken: cancel)
+                .ReceiveString();
+                
+            return JsonConvert.DeserializeObject<TbExtendedUserInfo>(rawResponse, JsonSerializerSettingsWithNullableGuidConverter);
         });
     }
 
@@ -53,9 +63,9 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
                 .SetQueryParam("entityGroupId", entityGroupId)
                 .SetQueryParam("entityGroupIds", entityGroupIds)
                 .PostJsonAsync(request, cancel)
-                .ReceiveJson<TbExtendedUserInfo>();
+                .ReceiveString();
 
-            return response;
+           return JsonConvert.DeserializeObject<TbExtendedUserInfo>(response, JsonSerializerSettingsWithNullableGuidConverter);
         });
     }
 
@@ -93,7 +103,7 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
                 .DeleteAsync(cancel);
         });
     }
-    
+
     public Task<TbPage<TbExtendedUserInfo>> GetCustomerUserInfos(Guid customerId,
         int pageSize,
         int page,
@@ -106,24 +116,27 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
         var policy = RequestBuilder.GetPolicyBuilder<TbPage<TbExtendedUserInfo>>()
             .RetryOnHttpTimeout()
             .RetryOnUnauthorized()
-            .FallbackValueOn(HttpStatusCode.NotFound, new TbPage<TbExtendedUserInfo>(0,0, false, Array.Empty<TbExtendedUserInfo>()))
+            .FallbackValueOn(HttpStatusCode.NotFound,
+                new TbPage<TbExtendedUserInfo>(0, 0, false, Array.Empty<TbExtendedUserInfo>()))
             .Build();
 
         return policy.ExecuteAsync(async builder =>
-        {
-            var response = await builder.CreateRequest()
-                .AppendPathSegment($"api/customer/{customerId}/userInfos")
-                .SetQueryParam("pageSize", pageSize)
-                .SetQueryParam("page", page)
-                .SetQueryParam("includeCustomers", includeCustomers)
-                .SetQueryParam("textSearch", textSearch)
-                .SetQueryParam("sortProperty", sortProperty)
-                .SetQueryParam("sortOrder", sortOrder)
-                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
-                .GetJsonAsync<TbPage<TbExtendedUserInfo>>(cancel);
-
-            return response;
-        });
+            {
+                // This is surely not the best way to handle the cases where the HomeDashboardId is null, but it works for now 
+                var rawResponse = await builder.CreateRequest()
+                    .AppendPathSegment($"api/customer/{customerId}/userInfos")
+                    .SetQueryParam("pageSize", pageSize)
+                    .SetQueryParam("page", page)
+                    .SetQueryParam("includeCustomers", includeCustomers)
+                    .SetQueryParam("textSearch", textSearch)
+                    .SetQueryParam("sortProperty", sortProperty)
+                    .SetQueryParam("sortOrder", sortOrder)
+                    .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                    .SendAsync(HttpMethod.Get, cancellationToken: cancel)
+                    .ReceiveString();
+                
+                return JsonConvert.DeserializeObject<TbPage<TbExtendedUserInfo>>(rawResponse, JsonSerializerSettingsWithNullableGuidConverter);
+            });
     }
 
     public Task<TbPage<TbExtendedUserInfo>> GetUsersByEntityGroupId(Guid entityGroupId, int pageSize, int page,
@@ -149,9 +162,11 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
                 .SetQueryParam("sortProperty", sortProperty)
                 .SetQueryParam("sortOrder", sortOrder)
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
-                .GetJsonAsync<TbPage<TbExtendedUserInfo>>(cancel);
+                .SendAsync(HttpMethod.Get, cancellationToken: cancel)
+                .ReceiveString();
+            // .GetJsonAsync<TbPage<TbExtendedUserInfo>>(cancel);
 
-            return response;
+            return JsonConvert.DeserializeObject<TbPage<TbExtendedUserInfo>>(response, JsonSerializerSettingsWithNullableGuidConverter);
         });
     }
 
@@ -179,6 +194,36 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
                 .GetJsonAsync<TbPage<TbUserInfo>>(cancel);
 
             return response;
+        });
+    }
+    
+    public Task<TbPage<TbExtendedUserInfo>> GetResellerUsers(int pageSize, int page, string? textSearch = null,
+        TbUserSearchSortProperty? sortProperty = null,
+        TbSortOrder? sortOrder = null, CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder<TbPage<TbExtendedUserInfo>>()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .FallbackValueOn(HttpStatusCode.NotFound,
+                new TbPage<TbExtendedUserInfo>(0, 0, false, Array.Empty<TbExtendedUserInfo>()))
+            .Build();
+
+        return policy.ExecuteAsync(async builder =>
+        {
+            var response = await builder.CreateRequest()
+                .AppendPathSegment("api/userInfos/all")
+                .SetQueryParam("page", page)
+                .SetQueryParam("includeCustomers", false)
+                .SetQueryParam("pageSize", pageSize)
+                .SetQueryParam("textSearch", textSearch)
+                .SetQueryParam("sortProperty", sortProperty)
+                .SetQueryParam("sortOrder", sortOrder)
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .SendAsync(HttpMethod.Get, cancellationToken: cancel)
+                .ReceiveString();
+
+            return JsonConvert.DeserializeObject<TbPage<TbExtendedUserInfo>>(response, JsonSerializerSettingsWithNullableGuidConverter);
+
         });
     }
 
