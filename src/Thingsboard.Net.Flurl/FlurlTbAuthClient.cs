@@ -1,16 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Flurl.Http;
+using Newtonsoft.Json;
 using Thingsboard.Net.Flurl.Utilities;
 
 namespace Thingsboard.Net.Flurl;
 
 public class FlurlTbAuthClient : FlurlTbClient<ITbAuthClient>, ITbAuthClient
 {
+    private static readonly JsonSerializerSettings JsonSerializerSettingsWithNullableGuidConverter = new()
+    {
+        Converters = new List<JsonConverter> { new GuidNullableConverter() }
+    };
+    
     /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
     public FlurlTbAuthClient(IRequestBuilder builder) : base(builder)
     {
+
     }
 
     /// <summary>
@@ -27,10 +36,14 @@ public class FlurlTbAuthClient : FlurlTbClient<ITbAuthClient>, ITbAuthClient
 
         return policy.ExecuteAsync(async builder =>
         {
-            return await builder.CreateRequest()
+            var response = await builder.CreateRequest()
                 .AppendPathSegment("/api/auth/user")
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
-                .GetJsonAsync<TbUserInfo>(cancel);
+                .SendAsync(HttpMethod.Get, cancellationToken: cancel)
+                .ReceiveString();
+                // .GetJsonAsync<TbUserInfo>(cancel);
+            
+            return JsonConvert.DeserializeObject<TbUserInfo>(response, JsonSerializerSettingsWithNullableGuidConverter);
         });
     }
 
