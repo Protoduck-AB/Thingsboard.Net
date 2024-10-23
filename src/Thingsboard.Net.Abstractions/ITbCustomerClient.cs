@@ -87,4 +87,22 @@ public interface ITbCustomerClient : ITbClient<ITbCustomerClient>
     /// <param name="cancel"></param>
     /// <returns></returns>
     Task<TbCustomer?> GetTenantCustomerAsync(string customerTitle, CancellationToken cancel = default);
+
+    /// <summary>
+    /// Returns a page of customers owned by another customer. You can specify parameters to filter the results. The result is wrapped with PageData object that allows you to iterate over result set using pagination. 
+    /// </summary>
+    /// <param name="pageSize">Maximum amount of entities in a one page</param>
+    /// <param name="page">Sequence number of page starting from 0</param>
+    /// <param name="sortProperty">Property of entity to sort</param>
+    /// <param name="sortOrder">Sort order. ASC (ASCENDING) or DESC (DESCENDING)</param>
+    /// <param name="includeCustomers">If true, the result will include the customers sub-customers</param>
+    /// <param name="cancel"></param>
+    /// <returns></returns>
+    Task<TbPage<TbCustomer>> GetResellerCustomersAsync(
+        int pageSize,
+        int page,
+        TbCustomerSortProperty? sortProperty = null,
+        TbSortOrder? sortOrder = null,
+        bool? includeCustomers = false,
+        CancellationToken cancel = default);
 }
