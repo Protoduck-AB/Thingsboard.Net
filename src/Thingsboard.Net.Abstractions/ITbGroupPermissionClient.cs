@@ -1,32 +1,26 @@
-﻿namespace Thingsboard.Net;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Thingsboard.Net.TbGroupPermissionModels;
+
+namespace Thingsboard.Net;
 
 /// <summary>
 /// The base interface for all Thingsboard client.
 /// </summary>
 /// <typeparam name="TClient"></typeparam>
-public interface ITbClient<out TClient> where TClient : ITbClient<TClient>
+/// public interface ITbAssetClient : ITbClient<ITbAssetClient>
+
+public interface ITbGroupPermissionClient : ITbClient<ITbGroupPermissionClient>
 {
     /// <summary>
-    /// Use custom credentials
+    /// Creates a group permission. 
     /// </summary>
-    /// <param name="username"></param>
-    /// <param name="password"></param>
+    /// <param name="groupPermission">
+    /// The group permission to create.
+    /// </param>
+    /// <param name="cancel">
+    /// The cancellation token.
+    /// </param>
     /// <returns></returns>
-    TClient WithCredentials(string username, string? password);
-
-    /// <summary>
-    /// Use custom HTTP timeout
-    /// </summary>
-    /// <param name="timeoutInSec">HTTP timeout in seconds</param>
-    /// <param name="retryTimes">When timeout occurred, retry times</param>
-    /// <param name="retryIntervalInSec">Waiting time before retry in seconds</param>
-    /// <returns></returns>
-    TClient WithHttpTimeout(int timeoutInSec, int retryTimes, int retryIntervalInSec);
-
-    /// <summary>
-    /// Use custom baseUrl
-    /// </summary>
-    /// <param name="baseUrl">baseUrl of thingsboard server, MUST contains http:// or https://</param>
-    /// <returns></returns>
-    TClient WithBaseUrl(string baseUrl);
+    Task<TbGroupPermissionResponse> SaveGroupPermissionAsync(TbGroupPermissionRequest groupPermission, CancellationToken cancel = default);
 }
