@@ -36,4 +36,23 @@ public class FlurlTbEntityGroupClient : FlurlTbClient<ITbEntityGroupClient>, ITb
             return response;
         });
     }
+    
+    public Task<TbEntityGroup> CreateEntityGroupAsync(TbEntityGroup entityGroup, CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder<TbEntityGroup>()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .Build();
+        
+        return policy.ExecuteAsync(async builder =>
+        {
+            var response = await builder.CreateRequest()
+                .AppendPathSegment("/api/entityGroup")
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .PostJsonAsync(entityGroup, cancel)
+                .ReceiveJson<TbEntityGroup>();
+                
+            return response;
+        });
+    }
 }
