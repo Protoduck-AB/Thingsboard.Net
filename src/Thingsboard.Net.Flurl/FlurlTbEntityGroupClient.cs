@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,6 +51,44 @@ public class FlurlTbEntityGroupClient : FlurlTbClient<ITbEntityGroupClient>, ITb
                 .AppendPathSegment("/api/entityGroup")
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
                 .PostJsonAsync(entityGroup, cancel)
+                .ReceiveJson<TbEntityGroup>();
+                
+            return response;
+        });
+    }
+
+    public Task AddUsersToEntityGroupAsync(Guid entityGroupId, List<Guid> userIds, CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder<TbEntityGroup>()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .Build();
+        
+        return policy.ExecuteAsync(async builder =>
+        {
+            var response = await builder.CreateRequest()
+                .AppendPathSegment($"/api/entityGroup/{entityGroupId}/addEntities")
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .PostJsonAsync(userIds, cancel)
+                .ReceiveJson<TbEntityGroup>();
+                
+            return response;
+        });
+    }
+
+    public Task DeleteUsersFromEntityGroupAsync(Guid entityGroupId, List<Guid> userIds, CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder<TbEntityGroup>()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .Build();
+        
+        return policy.ExecuteAsync(async builder =>
+        {
+            var response = await builder.CreateRequest()
+                .AppendPathSegment($"/api/entityGroup/{entityGroupId}/deleteEntities")
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .PostJsonAsync(userIds, cancel)
                 .ReceiveJson<TbEntityGroup>();
                 
             return response;
