@@ -85,4 +85,6 @@ public class FlurlTbClientFactory
     public ITbOtaPackageClient CreateOtaPackageClient() => new FlurlTbOtaPackageClient(CreateRequestBuilder());
     
     public ITbGroupPermissionClient CreateGroupPermissionClient() => new FlurlTbGroupPermissionClient(CreateRequestBuilder());
+    
+    public ITbRuleEngineClient CreateRuleEngineClient() => new FlurlTbRuleEngineClient(CreateRequestBuilder());
 }
