@@ -94,4 +94,6 @@ public class FlurlTbEntityGroupClient : FlurlTbClient<ITbEntityGroupClient>, ITb
             return response;
         });
     }
+    
+
 }

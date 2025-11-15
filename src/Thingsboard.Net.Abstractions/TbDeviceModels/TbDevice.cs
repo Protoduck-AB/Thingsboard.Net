@@ -39,7 +39,7 @@ public class TbDevice
 
     public TbEntityId? SoftwareId { get; set; }
     
-
+    public TbEntityId? OwnerId { get; set; }
 
     /// <summary>
     /// optional, defines additional infos for the device
