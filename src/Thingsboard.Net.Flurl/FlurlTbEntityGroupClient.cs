@@ -44,15 +44,25 @@ public class FlurlTbEntityGroupClient : FlurlTbClient<ITbEntityGroupClient>, ITb
             .RetryOnHttpTimeout()
             .RetryOnUnauthorized()
             .Build();
-        
+
         return policy.ExecuteAsync(async builder =>
         {
+            // Strip the Id field for creation — TB 3.9+ treats a non-null Id as an update
+            var body = new
+            {
+                entityGroup.Name,
+                entityGroup.Type,
+                ownerId = entityGroup.OwnerId,
+                additionalInfo = entityGroup.AdditionalInfo.Count > 0 ? entityGroup.AdditionalInfo : null,
+                configuration = entityGroup.Configuration,
+            };
+
             var response = await builder.CreateRequest()
                 .AppendPathSegment("/api/entityGroup")
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
-                .PostJsonAsync(entityGroup, cancel)
+                .PostJsonAsync(body, cancel)
                 .ReceiveJson<TbEntityGroup>();
-                
+
             return response;
         });
     }
