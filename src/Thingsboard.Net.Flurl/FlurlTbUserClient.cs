@@ -88,6 +88,24 @@ public class FlurlTbUserClient : FlurlTbClient<ITbUserClient>, ITbUserClient
         });
     }
 
+    public Task SetUserCredentialsEnabledAsync(Guid userId, bool enabled, CancellationToken cancel = default)
+    {
+        var policy = RequestBuilder.GetPolicyBuilder()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .FallbackOn(HttpStatusCode.NotFound, () => throw new TbEntityNotFoundException(new TbEntityId(TbEntityType.USER, userId)))
+            .Build();
+
+        return policy.ExecuteAsync(async builder =>
+        {
+            await builder.CreateRequest()
+                .AppendPathSegment($"api/user/{userId}/userCredentialsEnabled")
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .SetQueryParam("userCredentialsEnabled", enabled)
+                .PostAsync(null, cancellationToken: cancel);
+        });
+    }
+
     public Task DeleteUser(Guid userId, CancellationToken cancel = default)
     {
         var policy = RequestBuilder.GetPolicyBuilder()

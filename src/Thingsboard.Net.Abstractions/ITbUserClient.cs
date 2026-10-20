@@ -9,6 +9,7 @@ public interface ITbUserClient : ITbClient<ITbUserClient>
     Task<TbExtendedUserInfo?> GetExtendedUserInfo(Guid userId, CancellationToken cancel = default);
     Task<TbExtendedUserInfo> SaveUser(bool sendActivationMail, string entityGroupId, string entityGroupIds, TbExtendedUserInfo request, CancellationToken cancel = default);
     Task<string> GetActivationLink(Guid userId, CancellationToken cancel = default);
+    Task SetUserCredentialsEnabledAsync(Guid userId, bool enabled, CancellationToken cancel = default);
 
     Task<TbPage<TbExtendedUserInfo>> GetCustomerUserInfos(Guid customerId,
         int pageSize,
