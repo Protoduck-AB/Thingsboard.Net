@@ -388,8 +388,10 @@ public class FlurlTbDeviceClient : FlurlTbClient<ITbDeviceClient>, ITbDeviceClie
 
         return policy.ExecuteAsync(async builder =>
         {
+            // TB saves credentials on POST /api/device/credentials; the per-device path only serves GET
+            // (TB PE 3.9 answers 405 "Request method 'POST' is not supported" on it).
             var response = await builder.CreateRequest()
-                .AppendPathSegment($"/api/device/{credential.DeviceId}/credentials")
+                .AppendPathSegment("/api/device/credentials")
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
                 .PostJsonAsync(credential, cancel)
                 .ReceiveJson<TbDeviceCredential>();
