@@ -168,6 +168,35 @@ public class FlurlTbDeviceClient : FlurlTbClient<ITbDeviceClient>, ITbDeviceClie
     }
 
     /// <summary>
+    /// Changes the owner of the device to the tenant, i.e. removes it from the customer that owns it.
+    /// This is how ThingsBoard PE unassigns a device (POST /api/owner/TENANT/{tenantId}/DEVICE/{deviceId});
+    /// the CE route behind <see cref="UnassignDeviceFromCustomerAsync"/> answers 404 on PE 3.9.
+    /// Available for users with 'TENANT_ADMIN' authority.
+    /// </summary>
+    /// <param name="tenantId">A string value representing the tenant id. For example, '784f394c-42b6-435a-983c-b7beff2784f9'</param>
+    /// <param name="deviceId">A string value representing the device id. For example, '784f394c-42b6-435a-983c-b7beff2784f9'</param>
+    /// <param name="cancel"></param>
+    /// <returns></returns>
+    public Task ChangeDeviceOwnerToTenantAsync(Guid tenantId, Guid deviceId, CancellationToken cancel = default)
+    {
+        // A 404 here means the route or the device is missing; it must surface, not be swallowed
+        // like the CE unassign route silently was.
+        var policy = RequestBuilder.GetPolicyBuilder()
+            .RetryOnHttpTimeout()
+            .RetryOnUnauthorized()
+            .FallbackOn(HttpStatusCode.NotFound, () => throw new TbEntityNotFoundException(new TbEntityId(TbEntityType.DEVICE, deviceId)))
+            .Build();
+
+        return policy.ExecuteAsync(async builder =>
+        {
+            await builder.CreateRequest()
+                .AppendPathSegment($"api/owner/TENANT/{tenantId}/DEVICE/{deviceId}")
+                .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
+                .PostJsonAsync(null, cancel);
+        });
+    }
+
+    /// <summary>
     /// Update the Device. Specify existing Device id to update the device. Referencing non-existing device Id will cause 'Not Found' error.
     /// </summary>
     /// <param name="device">New device info</param>
@@ -359,8 +388,10 @@ public class FlurlTbDeviceClient : FlurlTbClient<ITbDeviceClient>, ITbDeviceClie
 
         return policy.ExecuteAsync(async builder =>
         {
+            // TB saves credentials on POST /api/device/credentials; the per-device path only serves GET
+            // (TB PE 3.9 answers 405 "Request method 'POST' is not supported" on it).
             var response = await builder.CreateRequest()
-                .AppendPathSegment($"/api/device/{credential.DeviceId}/credentials")
+                .AppendPathSegment("/api/device/credentials")
                 .WithOAuthBearerToken(await builder.GetAccessTokenAsync())
                 .PostJsonAsync(credential, cancel)
                 .ReceiveJson<TbDeviceCredential>();
