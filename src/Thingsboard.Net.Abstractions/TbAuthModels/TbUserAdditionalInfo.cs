@@ -14,7 +14,7 @@ public class TbUserAdditionalInfo
         Dictionary<string, string> userPasswordHistory,
         bool                       userCredentialsEnabled,
         int                        failedLoginAttempts,
-        long                       lastLoginTs
+        long?                      lastLoginTs
     )
     {
         Description                = description;
@@ -36,5 +36,5 @@ public class TbUserAdditionalInfo
     public Dictionary<string, string> UserPasswordHistory        { get; }
     public bool                       UserCredentialsEnabled     { get; }
     public int                        FailedLoginAttempts        { get; }
-    public long                       LastLoginTs                { get; }
+    public long?                      LastLoginTs                { get; }
 }
